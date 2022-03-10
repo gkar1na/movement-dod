@@ -70,7 +70,8 @@ async def start(SessionLocal):
         await repository.delete(is_admin=users_data[1]['is_admin'])  # no exceptions
         assert await repository.get_one(is_admin=users_data[1]['is_admin']) is None  # element deleted
 
-        assert await repository.add(users_data[1]) == users_data[1]
+        await repository.delete()
+        assert await repository.add(users_data) == users_data
         for user_data in users_data:
             if 'step' in user_data.keys():
                 user_data = user_data

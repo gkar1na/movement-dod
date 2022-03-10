@@ -8,3 +8,6 @@ with open('tests/data/button.json') as f:
 
 with open('tests/data/user_data.json') as f:
     users_data = json.load(f)
+
+with open('tests/data/token.json') as f:
+    tokens = json.load(f)

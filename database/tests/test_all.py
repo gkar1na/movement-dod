@@ -8,7 +8,8 @@ from database.tests import (
     test_dropping,
     test_script,
     test_button,
-    test_user_data
+    test_user_data,
+    test_token
 )
 
 from database.config import settings
@@ -36,6 +37,7 @@ class TestBase:
         await test_script.start(self.session_local)
         await test_button.start(self.session_local)
         await test_user_data.start(self.session_local)
+        await test_token.start(self.session_local)
         # await test_dropping.start(self.engine, self.base)
 
         print('------------------FINISH TESTING-----------------')
