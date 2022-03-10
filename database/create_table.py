@@ -42,7 +42,7 @@ meta = MetaData(naming_convention=convention)
 Base = declarative_base(metadata=meta)
 
 
-class ScriptModel:
+class ScriptModel(Base):
     __tablename__ = 'script'
 
     uid = Column(String, default=str(create_uuid), primary_key=True)
@@ -50,7 +50,7 @@ class ScriptModel:
     text = Column(String, nullable=False)
 
 
-class ButtonModel:
+class ButtonModel(Base):
     __tablename__ = 'button'
 
     uid = Column(String, default=str(create_uuid), primary_key=True)
@@ -67,7 +67,7 @@ class ButtonModel:
     )
 
 
-class UserDataModel:
+class UserDataModel(Base):
     __tablename__ = 'user_data'
 
     uid = Column(String, default=str(create_uuid), primary_key=True)
@@ -76,7 +76,7 @@ class UserDataModel:
     step = Column(String, ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'))
 
 
-class TokenModel:
+class TokenModel(Base):
     __tablename__ = 'token'
 
     code = Column(String, default=str(create_uuid), primary_key=True)
