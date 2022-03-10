@@ -7,10 +7,11 @@ from database.tests import (
     test_creating,
     test_dropping,
     test_script,
-    test_button
+    test_button,
+    test_user_data
 )
 
-from config import settings
+from database.config import settings
 
 
 class TestBase:
@@ -34,6 +35,7 @@ class TestBase:
         await test_creating.start(self.session_local)
         await test_script.start(self.session_local)
         await test_button.start(self.session_local)
+        await test_user_data.start(self.session_local)
         # await test_dropping.start(self.engine, self.base)
 
         print('------------------FINISH TESTING-----------------')

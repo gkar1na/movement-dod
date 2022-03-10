@@ -1,6 +1,5 @@
-from tests.test_data import scripts
-
-from repositories.script import ScriptRepository
+from database.repositories.script import ScriptRepository
+from database.tests.test_data import scripts
 
 
 async def start(SessionLocal):

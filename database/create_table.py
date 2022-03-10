@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from uuid import uuid4
 
-from config import settings
+from database.config import settings
 
 
 convention = {

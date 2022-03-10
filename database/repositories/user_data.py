@@ -3,7 +3,7 @@ from sqlalchemy.sql.dml import Update
 from sqlalchemy.sql.expression import select, delete, update
 from typing import Optional, List, Union
 
-from create_table import UserDataModel
+from database.create_table import UserDataModel
 
 
 def fill_query(query,
@@ -109,9 +109,6 @@ class UserDataRepository:
 
             if 'is_admin' in user_data.keys():
                 params['is_admin'] = user_data['is_admin']
-            else:
-                raise ValueError(f'Unable to add new user_data '
-                                 f'because a parameter "is_admin" does not exist.')
 
             if 'step' in user_data.keys():
                 params['step'] = user_data['step']

@@ -3,7 +3,7 @@ from sqlalchemy.sql.dml import Update
 from sqlalchemy.sql.expression import select, delete, update
 from typing import Optional, List, Union
 
-from create_table import ButtonModel
+from database.create_table import ButtonModel
 
 
 def fill_query(query, uid='', title_from='', text='', title_to='',

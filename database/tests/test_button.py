@@ -1,7 +1,8 @@
 from random import randint
-from database.repositories.button import ButtonRepository
 
-from tests.test_data import buttons
+from database.repositories.button import ButtonRepository
+from database.tests.test_data import buttons
+
 from database.repositories.script import ScriptRepository
 
 
@@ -59,6 +60,7 @@ async def start(SessionLocal):
 
         # deletes by parameter
         assert await repository.add(buttons[1]) == buttons[1]
+        old_uid = (await repository.get_one(text=buttons[1]['text']))['uid']
         assert await repository.get_one(uid=old_uid) is not None  # element exists
         await repository.delete(uid=old_uid)  # no exceptions
         assert await repository.get_one(uid=old_uid) is None  # element deleted
