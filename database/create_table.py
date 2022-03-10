@@ -51,41 +51,44 @@ class ScriptModel(Base):
     text = Column(String, nullable=False)
 
 
-# class ButtonModel(Base):
-#     __tablename__ = 'button'
-#
-#     uid = Column(String, default=str(create_uuid), primary_key=True)
-#     title_from = Column(
-#         String,
-#         ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
-#         nullable=False
-#     )
-#     text = Column(String, nullable=False)
-#     title_to = Column(
-#         String,
-#         ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
-#         nullable=False
-#     )
-#
-#
-# class UserDataModel(Base):
-#     __tablename__ = 'user_data'
-#
-#     uid = Column(String, default=str(create_uuid), primary_key=True)
-#     tg_chat_id = Column(BigInteger, nullable=False, unique=True)
-#     is_admin = Column(Boolean, nullable=False)
-#     step = Column(String, ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'))
-#
-#
-# class TokenModel(Base):
-#     __tablename__ = 'token'
-#
-#     code = Column(String, default=str(create_uuid), primary_key=True)
-#     is_active = Column(Boolean, nullable=False)
-#     tg_chat_id = Column(
-#         BigInteger,
-#         ForeignKey(UserDataModel.tg_chat_id, onupdate='cascade', ondelete='cascade')
-#     )
+class ButtonModel(Base):
+    __tablename__ = 'button'
+
+    uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
+    title_from = Column(
+        UUID(as_uuid=True),
+        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
+        nullable=False
+    )
+    text = Column(String, nullable=False)
+    title_to = Column(
+        UUID(as_uuid=True),
+        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
+        nullable=False
+    )
+
+
+class UserDataModel(Base):
+    __tablename__ = 'user_data'
+
+    uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
+    tg_chat_id = Column(BigInteger, nullable=False, unique=True)
+    is_admin = Column(Boolean, nullable=False)
+    step = Column(
+        UUID(as_uuid=True),
+        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade')
+    )
+
+
+class TokenModel(Base):
+    __tablename__ = 'token'
+
+    code = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
+    is_active = Column(Boolean, nullable=False)
+    tg_chat_id = Column(
+        BigInteger,
+        ForeignKey(UserDataModel.tg_chat_id, onupdate='cascade', ondelete='cascade')
+    )
 
 
 # create tables
