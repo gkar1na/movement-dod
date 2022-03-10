@@ -71,9 +71,13 @@ async def start(SessionLocal):
         assert await repository.get_one(is_admin=users_data[1]['is_admin']) is None  # element deleted
 
         assert await repository.add(users_data[1]) == users_data[1]
-        assert await repository.get_one(step=users_data[1]['step']) is not None  # element exists
-        await repository.delete(step=users_data[1]['step'])  # no exceptions
-        assert await repository.get_one(step=users_data[1]['step']) is None  # element deleted
+        for user_data in users_data:
+            if 'step' in user_data.keys():
+                user_data = user_data
+                break
+        assert await repository.get_one(step=user_data['step']) is not None  # element exists
+        await repository.delete(step=user_data['step'])  # no exceptions
+        assert await repository.get_one(step=user_data['step']) is None  # element deleted
 
         # return of modified data
         await repository.delete()

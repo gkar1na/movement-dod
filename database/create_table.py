@@ -73,7 +73,7 @@ class UserDataModel(Base):
 
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     tg_chat_id = Column(BigInteger, nullable=False, unique=True)
-    is_admin = Column(Boolean, nullable=False, default=False)
+    is_admin = Column(Boolean, default=False)
     step = Column(
         UUID(as_uuid=True),
         ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade')
@@ -83,8 +83,8 @@ class UserDataModel(Base):
 class TokenModel(Base):
     __tablename__ = 'token'
 
-    code = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
-    is_active = Column(Boolean, nullable=False)
+    uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
+    is_active = Column(Boolean, default=True)
     tg_chat_id = Column(
         BigInteger,
         ForeignKey(UserDataModel.tg_chat_id, onupdate='cascade', ondelete='cascade')
