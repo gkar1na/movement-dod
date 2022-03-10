@@ -73,7 +73,7 @@ class UserDataModel(Base):
 
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     tg_chat_id = Column(BigInteger, nullable=False, unique=True)
-    is_admin = Column(Boolean, nullable=False)
+    is_admin = Column(Boolean, nullable=False, default=False)
     step = Column(
         UUID(as_uuid=True),
         ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade')
