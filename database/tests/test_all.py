@@ -6,7 +6,8 @@ from sqlalchemy.orm.session import sessionmaker
 from database.tests import (
     test_creating,
     test_dropping,
-    test_script
+    test_script,
+    test_button
 )
 
 from config import settings
@@ -32,6 +33,7 @@ class TestBase:
         await test_dropping.start(self.engine, self.base)
         await test_creating.start(self.session_local)
         await test_script.start(self.session_local)
+        await test_button.start(self.session_local)
         # await test_dropping.start(self.engine, self.base)
 
         print('------------------FINISH TESTING-----------------')

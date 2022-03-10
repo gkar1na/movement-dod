@@ -4,7 +4,7 @@ from repositories.script import ScriptRepository
 
 
 async def start(SessionLocal):
-    print('----------START INTERACTION WITH ROLES---------')
+    print('----------START INTERACTION WITH SCRIPTS---------')
 
     async with SessionLocal() as session:
         repository = ScriptRepository(session)
@@ -63,4 +63,4 @@ async def start(SessionLocal):
         # close session
         await session.close()
 
-    print('---------FINISH INTERACTION WITH ROLES--------\n')
+    print('---------FINISH INTERACTION WITH SCRIPTS--------\n')
