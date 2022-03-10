@@ -1,7 +1,7 @@
 import asyncio
 
 from sqlalchemy.ext.asyncio.engine import create_async_engine
-from sqlalchemy.sql.sqltypes import String, Boolean, BigInteger, DateTime
+from sqlalchemy.sql.sqltypes import String, Boolean, BigInteger
 from sqlalchemy.sql.schema import Column, ForeignKey, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -40,6 +40,51 @@ SessionLocal = sessionmaker(
 
 meta = MetaData(naming_convention=convention)
 Base = declarative_base(metadata=meta)
+
+
+class ScriptModel:
+    __tablename__ = 'script'
+
+    uid = Column(String, default=str(create_uuid), primary_key=True)
+    title = Column(String, nullable=False)
+    text = Column(String, nullable=False)
+
+
+class ButtonModel:
+    __tablename__ = 'button'
+
+    uid = Column(String, default=str(create_uuid), primary_key=True)
+    title_from = Column(
+        String,
+        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
+        nullable=False
+    )
+    text = Column(String, nullable=False)
+    title_to = Column(
+        String,
+        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
+        nullable=False
+    )
+
+
+class UserDataModel:
+    __tablename__ = 'user_data'
+
+    uid = Column(String, default=str(create_uuid), primary_key=True)
+    tg_chat_id = Column(BigInteger, nullable=False, unique=True)
+    is_admin = Column(Boolean, nullable=False)
+    step = Column(String, ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'))
+
+
+class TokenModel:
+    __tablename__ = 'token'
+
+    code = Column(String, default=str(create_uuid), primary_key=True)
+    is_active = Column(Boolean, nullable=False)
+    tg_chat_id = Column(
+        BigInteger,
+        ForeignKey(UserDataModel.tg_chat_id, onupdate='cascade', ondelete='cascade')
+    )
 
 
 # create tables

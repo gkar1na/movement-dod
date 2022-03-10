@@ -3,6 +3,11 @@ from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm.session import sessionmaker
 
+from database.tests import (
+    test_creating,
+    test_dropping
+)
+
 from config import settings
 
 
@@ -18,3 +23,13 @@ class TestBase:
             expire_on_commit=False,
             class_=AsyncSession
         )
+
+    async def start(self):
+        print('------------------START TESTING------------------\n')
+
+        await test_creating.start(self.session_local)
+        await test_dropping.start(self.engine, self.base)
+        await test_creating.start(self.session_local)
+        # await test_dropping.start(self.engine, self.base)
+
+        print('------------------FINISH TESTING-----------------')

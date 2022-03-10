@@ -4,7 +4,7 @@ from pkg_resources import parse_requirements
 from setuptools import setup, find_packages
 
 
-__version__ = '0.1'
+__version__ = '0.0.1'
 
 
 def load_requirements(fname: str) -> list:
@@ -27,7 +27,7 @@ SETUP_KWARGS = dict(
     author_email='karina_gordeeva02@mail.ru',
     license='MIT',
     python_requires='>=3.8',
-    packages=find_packages(exclude=['tests*', 'repositories*']),
+    packages=find_packages(exclude=['test*', 'repositories*']),
     include_package_data=True,
     install_requires=load_requirements('requirements.txt')
 )
