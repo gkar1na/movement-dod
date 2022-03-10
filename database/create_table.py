@@ -92,20 +92,12 @@ class TokenModel(Base):
 
 
 # create tables
-async def update_tables(dev=False):
-    from tests.test_all import TestBase
-
+async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
-    if dev:
-        testing = TestBase(Base)
-        await testing.start()
-
-    print('DB - OK')
     return 0
 
 
 if __name__ == "__main__":
     # uncomment to test all db functions
-    asyncio.run(update_tables(dev=True))
+    asyncio.run(main())

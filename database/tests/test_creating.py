@@ -1,4 +1,4 @@
-from database.create_table import update_tables
+from database.create_table import main
 
 
 async def start(SessionLocal):
@@ -6,7 +6,7 @@ async def start(SessionLocal):
 
     # all tables with dependencies exist or are being created
     async with SessionLocal() as session:
-        assert await update_tables() == 0  # no exceptions
+        assert await main() == 0  # no exceptions
 
         # close session
         await session.close()
