@@ -1,29 +1,41 @@
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.sql.dml import Update
 from sqlalchemy.sql.expression import select, delete, update
 from typing import Optional, List, Union
 
 from create_table import ScriptModel
 
 
-def fill_query(query, uid='', title='', text='',
-               new_uid='', new_title='', new_text=''):
+def fill_query(query, uid='', title='', text='', new_title='', new_text=''):
+    is_query_empty = True
+
     if uid != '':
+        is_query_empty = False
         query = query.where(ScriptModel.uid == uid)
 
     if title != '':
+        is_query_empty = False
         query = query.where(ScriptModel.title == title)
 
     if text != '':
+        is_query_empty = False
         query = query.where(ScriptModel.text == text)
 
-    if new_uid != '':
-        query = query.values(uid=new_uid)
+    if isinstance(query, Update):
+        if is_query_empty:
+            return None
+        is_query_empty = True
 
-    if new_title != '':
-        query = query.values(title=title)
+        if new_title != '':
+            is_query_empty = False
+            query = query.values(title=new_title)
 
-    if new_text != '':
-        query = query.values(text=text)
+        if new_text != '':
+            is_query_empty = False
+            query = query.values(text=new_text)
+
+        if is_query_empty:
+            return None
 
     return query
 
@@ -34,9 +46,7 @@ class ScriptRepository:
         self.session = session
 
     async def get_all(self, uid='', title='', text='') -> List[Optional[dict]]:
-        query = select(ScriptModel)
-
-        query = fill_query(query, uid, title, text)
+        query = fill_query(select(ScriptModel), uid, title, text)
 
         scripts = [
             {
@@ -60,9 +70,7 @@ class ScriptRepository:
         return None
 
     async def delete(self, uid='', title='', text='') -> None:
-        query = delete(ScriptModel)
-
-        query = fill_query(query, uid, title, text)
+        query = fill_query(delete(ScriptModel), uid, title, text)
 
         await self.session.execute(query)
         await self.session.commit()
@@ -70,8 +78,6 @@ class ScriptRepository:
         return None
 
     async def add(self, scripts: Union[dict, List[dict]]) -> Union[dict, List[dict]]:
-        query = select(ScriptModel).distinct()
-
         if type(scripts) == dict:
             scripts = [scripts]
 
@@ -79,12 +85,6 @@ class ScriptRepository:
 
         for script in scripts:
             params = {}
-
-            if 'uid' in script.keys():
-                params['uid'] = script['uid']
-            else:
-                raise ValueError(f'Unable to add new script '
-                                 f'because a parameter "uid" does not exist.')
 
             if 'title' in script.keys():
                 params['title'] = script['title']
@@ -109,11 +109,10 @@ class ScriptRepository:
 
         return return_scripts
 
-    async def update(self, uid='', title='', text='',
-                     new_uid='', new_title='', new_text='') -> None:
-        query = update(ScriptModel)
-
-        query = fill_query(query, uid, title, text, new_uid, new_title, new_text)
+    async def update(self, uid='', title='', text='', new_title='', new_text='') -> None:
+        query = fill_query(update(ScriptModel), uid, title, text, new_title, new_text)
+        if query is None:
+            return None
 
         await self.session.execute(query)
         await self.session.commit()
