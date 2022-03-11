@@ -1,12 +1,16 @@
 from typing import Optional
 
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from pydantic import BaseSettings
+from aiogram.types import ParseMode
+
+from aiogram import Dispatcher, Bot
 
 
 class Settings(BaseSettings):
     """ Instance stores all app settings, mainly environment variables """
     PROJECT_NAME: str = 'Movement Quest'
-    DB_PATH: Optional[str]
+    TG_TOKEN: Optional[str]
 
     class Config:
         env_prefix = 'MOVEMENT_QUEST_'
@@ -16,3 +20,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+storage = MemoryStorage()
+bot = Bot(token=settings.TG_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher(bot, storage=storage)
