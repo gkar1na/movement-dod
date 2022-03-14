@@ -6,9 +6,10 @@ from typing import Optional, List, Union
 from database.create_table import UserDataModel
 
 
-def fill_query(query,
-               uid='', tg_chat_id: Optional[int] = '', is_admin: Optional[bool] = '', step='',
-               new_tg_chat_id: Optional[int] = '', new_is_admin: Optional[bool] = '', new_step=''):
+def fill_query(query, uid='', tg_chat_id: Optional[int] = '',
+               is_admin: Optional[bool] = '', step='', quest_message_id: Optional[int] = '',
+               new_tg_chat_id: Optional[int] = '', new_is_admin: Optional[bool] = '',
+               new_step='', new_quest_message_id: Optional[int] = ''):
     is_query_empty = True
 
     if uid != '':
@@ -27,6 +28,10 @@ def fill_query(query,
         is_query_empty = False
         query = query.where(UserDataModel.step == step)
 
+    if quest_message_id != '':
+        is_query_empty = False
+        query = query.where(UserDataModel.quest_message_id == quest_message_id)
+
     if isinstance(query, Update):
         if is_query_empty:
             return None
@@ -44,6 +49,10 @@ def fill_query(query,
             is_query_empty = False
             query = query.values(step=new_step)
 
+        if new_quest_message_id != '':
+            is_query_empty = False
+            query = query.values(quest_message_id=new_quest_message_id)
+
         if is_query_empty:
             return None
 
@@ -55,37 +64,39 @@ class UserDataRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_all(self, uid='', tg_chat_id: Optional[int] = '',
-                      is_admin: Optional[bool] = '', step='') -> List[Optional[dict]]:
-        query = fill_query(select(UserDataModel), uid, tg_chat_id, is_admin, step)
+    async def get_all(self, uid='', tg_chat_id: Optional[int] = '', is_admin: Optional[bool] = '',
+                      step='', quest_message_id: Optional[int] = '') -> List[Optional[dict]]:
+        query = fill_query(select(UserDataModel), uid, tg_chat_id, is_admin, step, quest_message_id)
 
         users_data = [
             {
                 'uid': user_data.uid,
                 'tg_chat_id': user_data.tg_chat_id,
                 'is_admin': user_data.is_admin,
-                'step': user_data.step
+                'step': user_data.step,
+                'quest_message_id': user_data.quest_message_id
             } for user_data in (await self.session.execute(query)).scalars()
         ]
 
         return users_data
 
-    async def get_one(self, uid='', tg_chat_id: Optional[int] = '',
-                      is_admin: Optional[bool] = '', step='') -> Optional[dict]:
+    async def get_one(self, uid='', tg_chat_id: Optional[int] = '', is_admin: Optional[bool] = '',
+                      step='', quest_message_id: Optional[int] = '') -> Optional[dict]:
         users_data = await self.get_all(
             uid=uid,
             tg_chat_id=tg_chat_id,
             is_admin=is_admin,
-            step=step
+            step=step,
+            quest_message_id=quest_message_id
         )
 
         if users_data and users_data[0]:
             return users_data[0]
         return None
 
-    async def delete(self, uid='', tg_chat_id: Optional[int] = '',
-                     is_admin: Optional[bool] = '', step='') -> None:
-        query = fill_query(delete(UserDataModel), uid, tg_chat_id, is_admin, step)
+    async def delete(self, uid='', tg_chat_id: Optional[int] = '', is_admin: Optional[bool] = '',
+                     step='', quest_message_id: Optional[int] = '') -> None:
+        query = fill_query(delete(UserDataModel), uid, tg_chat_id, is_admin, step, quest_message_id)
 
         await self.session.execute(query)
         await self.session.commit()
@@ -113,6 +124,9 @@ class UserDataRepository:
             if 'step' in user_data.keys():
                 params['step'] = user_data['step']
 
+            if 'quest_message_id' in user_data.keys():
+                params['quest_message_id'] = user_data['quest_message_id']
+
             self.session.add(UserDataModel(**params))
 
             return_users_data.append(params)
@@ -124,13 +138,14 @@ class UserDataRepository:
 
         return return_users_data
 
-    async def update(self, uid='', tg_chat_id: Optional[int] = '',
-                     is_admin: Optional[bool] = '', step='', new_tg_chat_id: Optional[int] = '',
-                     new_is_admin: Optional[bool] = '', new_step='') -> None:
+    async def update(self, uid='', tg_chat_id: Optional[int] = '', is_admin: Optional[bool] = '',
+                     step='', quest_message_id: Optional[int] = '',
+                     new_tg_chat_id: Optional[int] = '', new_is_admin: Optional[bool] = '',
+                     new_step='', new_quest_message_id: Optional[int] = '') -> None:
         query = fill_query(
             update(UserDataModel),
-            uid, tg_chat_id, is_admin, step,
-            new_tg_chat_id, new_is_admin, new_step
+            uid, tg_chat_id, is_admin, step, quest_message_id,
+            new_tg_chat_id, new_is_admin, new_step, new_quest_message_id
         )
         if query is None:
             return None
