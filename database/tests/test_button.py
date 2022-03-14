@@ -18,8 +18,8 @@ async def start(SessionLocal):
             i_to = randint(0, len_scripts)
             while i_to == i_from:
                 i_to = randint(0, len_scripts)
-            button['title_from'] = scripts[i_from]['uid']
-            button['title_to'] = scripts[i_to]['uid']
+            button['title_from'] = scripts[i_from]['title']
+            button['title_to'] = scripts[i_to]['title']
 
         repository = ButtonRepository(session)
 
@@ -40,17 +40,17 @@ async def start(SessionLocal):
         await repository.update(new_text='100000000')
         assert await repository.get_one(text='100000000') is None  # no update is performed without input data
 
-        await repository.update(uid=old_uid, new_title_from=scripts[0]['uid'])
-        assert await repository.get_one(title_from=scripts[0]['uid']) is not None  # updating by uid
+        await repository.update(uid=old_uid, new_title_from=scripts[0]['title'])
+        assert await repository.get_one(title_from=scripts[0]['title']) is not None  # updating by uid
 
-        await repository.update(title_from=scripts[0]['uid'], new_text='new text')
+        await repository.update(title_from=scripts[0]['title'], new_text='new text')
         assert await repository.get_one(text='new text') is not None  # updating by title_from
 
-        await repository.update(text='new text', new_title_to=scripts[1]['uid'])
-        assert await repository.get_one(title_to=scripts[1]['uid']) is not None  # updating by text
+        await repository.update(text='new text', new_title_to=scripts[1]['title'])
+        assert await repository.get_one(title_to=scripts[1]['title']) is not None  # updating by text
 
-        await repository.update(title_to=scripts[1]['uid'], new_title_to=scripts[2]['uid'])
-        assert await repository.get_one(title_to=scripts[2]['uid']) is not None  # updating by text
+        await repository.update(title_to=scripts[1]['title'], new_title_to=scripts[2]['title'])
+        assert await repository.get_one(title_to=scripts[2]['title']) is not None  # updating by text
 
         # does not delete non-existent elements and does not throw exceptions
         old_number = len(await repository.get_all())
