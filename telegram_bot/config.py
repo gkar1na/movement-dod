@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     """ Instance stores all app settings, mainly environment variables """
     PROJECT_NAME: str = 'Movement Quest'
     TG_TOKEN: Optional[str]
+    START_TITLE: Optional[str]
 
     class Config:
         env_prefix = 'MOVEMENT_QUEST_'
