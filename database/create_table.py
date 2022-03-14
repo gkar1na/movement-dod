@@ -47,7 +47,7 @@ class ScriptModel(Base):
     __tablename__ = 'script'
 
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
-    title = Column(String, nullable=False)
+    title = Column(String, nullable=False, unique=True)
     text = Column(String, nullable=False)
 
 
@@ -56,14 +56,14 @@ class ButtonModel(Base):
 
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     title_from = Column(
-        UUID(as_uuid=True),
-        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
+        String,
+        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade'),
         nullable=False
     )
     text = Column(String, nullable=False)
     title_to = Column(
-        UUID(as_uuid=True),
-        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade'),
+        String,
+        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade'),
         nullable=False
     )
 
@@ -75,8 +75,8 @@ class UserDataModel(Base):
     tg_chat_id = Column(BigInteger, nullable=False, unique=True)
     is_admin = Column(Boolean, default=False)
     step = Column(
-        UUID(as_uuid=True),
-        ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade')
+        String,
+        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
     )
     quest_message_id = Column(BigInteger)
 

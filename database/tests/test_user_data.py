@@ -15,7 +15,7 @@ async def start(SessionLocal):
         len_scripts = len(scripts) - 1
         for user_data in users_data:
             if randint(0, 2):
-                user_data['step'] = scripts[randint(0, len_scripts)]['uid']
+                user_data['step'] = scripts[randint(0, len_scripts)]['title']
 
         repository = UserDataRepository(session)
 
@@ -42,10 +42,10 @@ async def start(SessionLocal):
         await repository.update(tg_chat_id=1, new_is_admin=not users_data[1]['is_admin'])
         assert await repository.get_one(tg_chat_id=1, is_admin=not users_data[1]['is_admin']) is not None  # updating by tg_chat_id
 
-        await repository.update(tg_chat_id=1, is_admin=not users_data[1]['is_admin'], new_step=scripts[1]['uid'])
-        assert await repository.get_one(step=scripts[1]['uid']) is not None  # updating by tg_chat_id
+        await repository.update(tg_chat_id=1, is_admin=not users_data[1]['is_admin'], new_step=scripts[1]['title'])
+        assert await repository.get_one(step=scripts[1]['title']) is not None  # updating by tg_chat_id
 
-        await repository.update(step=scripts[1]['uid'], new_quest_message_id=0)
+        await repository.update(step=scripts[1]['title'], new_quest_message_id=0)
         assert await repository.get_one(quest_message_id=0) is not None  # updating by step
 
         await repository.update(quest_message_id=0, new_quest_message_id=100)
