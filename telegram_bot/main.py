@@ -14,15 +14,5 @@ async def send_help(message: types.Message):
     await message.reply('I\'m just alive.')
 
 
-@dp.message_handler(regexp='(^test?$)')
-async def test(message: types.Message):
-    await message.reply('I\'m still alive.')
-
-
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
-
-
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)

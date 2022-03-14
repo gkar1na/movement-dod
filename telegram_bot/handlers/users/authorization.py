@@ -1,5 +1,5 @@
 import logging
-from aiogram import executor, types
+from aiogram import types
 
 from telegram_bot.config import dp
 
@@ -27,6 +27,3 @@ async def send_welcome(message: types.Message):
         else:
             await message.reply('You are now in the database.')
     await session.close()
-
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
