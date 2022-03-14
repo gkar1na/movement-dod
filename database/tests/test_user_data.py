@@ -28,9 +28,11 @@ async def start(SessionLocal):
         # updating zero amount of data does not change the item
         assert (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['tg_chat_id'] == users_data[1]['tg_chat_id']
         assert (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['is_admin'] == users_data[1]['is_admin']
+        assert (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['quest_message_id'] == users_data[1]['quest_message_id']
         await repository.update(uid=old_uid)
         assert (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['tg_chat_id'] == users_data[1]['tg_chat_id']
         assert (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['is_admin'] == users_data[1]['is_admin']
+        assert (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['quest_message_id'] == users_data[1]['quest_message_id']
         await repository.update(new_tg_chat_id=123)
         assert await repository.get_one(tg_chat_id=123) is None  # no update is performed without input data
 
@@ -43,8 +45,11 @@ async def start(SessionLocal):
         await repository.update(tg_chat_id=1, is_admin=not users_data[1]['is_admin'], new_step=scripts[1]['uid'])
         assert await repository.get_one(step=scripts[1]['uid']) is not None  # updating by tg_chat_id
 
-        await repository.update(step=scripts[1]['uid'], new_step=scripts[2]['uid'])
-        assert await repository.get_one(step=scripts[2]['uid']) is not None  # updating by step
+        await repository.update(step=scripts[1]['uid'], new_quest_message_id=0)
+        assert await repository.get_one(quest_message_id=0) is not None  # updating by step
+
+        await repository.update(quest_message_id=0, new_quest_message_id=100)
+        assert await repository.get_one(quest_message_id=100) is not None  # updating by quest_message_id
 
         # does not delete non-existent elements and does not throw exceptions
         old_number = len(await repository.get_all())
@@ -79,6 +84,12 @@ async def start(SessionLocal):
         assert await repository.get_one(step=user_data['step']) is not None  # element exists
         await repository.delete(step=user_data['step'])  # no exceptions
         assert await repository.get_one(step=user_data['step']) is None  # element deleted
+
+        await repository.delete()
+        assert await repository.add(users_data) == users_data
+        assert await repository.get_one(quest_message_id=users_data[1]['quest_message_id']) is not None  # element exists
+        await repository.delete(quest_message_id=users_data[1]['quest_message_id'])  # no exceptions
+        assert await repository.get_one(quest_message_id=users_data[1]['quest_message_id']) is None  # element deleted
 
         # return of modified data
         await repository.delete()

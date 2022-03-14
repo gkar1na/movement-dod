@@ -78,6 +78,7 @@ class UserDataModel(Base):
         UUID(as_uuid=True),
         ForeignKey(ScriptModel.uid, onupdate='cascade', ondelete='cascade')
     )
+    quest_message_id = Column(BigInteger)
 
 
 class TokenModel(Base):
