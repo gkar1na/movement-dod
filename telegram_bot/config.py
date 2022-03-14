@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = 'Movement Quest'
     TG_TOKEN: Optional[str]
     START_TITLE: Optional[str]
+    STOP_TITLE: Optional[str]
 
     class Config:
         env_prefix = 'MOVEMENT_QUEST_'
