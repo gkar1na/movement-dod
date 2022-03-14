@@ -45,7 +45,8 @@ async def start(SessionLocal):
         assert await repository.get_one(uid=old_uid) is None  # element deleted
         del old_uid
 
-        assert await repository.add(scripts[1]) == scripts[1]
+        await repository.delete()
+        assert await repository.add(scripts) == scripts
         assert await repository.get_one(title=scripts[1]['title']) is not None  # element exists
         await repository.delete(title=scripts[1]['title'])  # no exceptions
         assert await repository.get_one(title=scripts[1]['title']) is None  # element deleted
