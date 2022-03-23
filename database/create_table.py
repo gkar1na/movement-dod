@@ -57,14 +57,12 @@ class ButtonModel(Base):
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     title_from = Column(
         String,
-        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade'),
-        nullable=False
+        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
     )
     text = Column(String, nullable=False)
     title_to = Column(
         String,
-        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade'),
-        nullable=False
+        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
     )
 
 
@@ -79,6 +77,7 @@ class UserDataModel(Base):
         ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
     )
     quest_message_id = Column(BigInteger)
+    is_in_quest = Column(Boolean, default=False)
 
 
 class TokenModel(Base):
