@@ -48,8 +48,11 @@ async def start(SessionLocal):
         await repository.update(step=scripts[1]['title'], new_quest_message_id=0)
         assert await repository.get_one(quest_message_id=0) is not None  # updating by step
 
-        await repository.update(quest_message_id=0, new_quest_message_id=100)
-        assert await repository.get_one(quest_message_id=100) is not None  # updating by quest_message_id
+        await repository.update(quest_message_id=0, new_is_admin=not users_data[1]['is_in_quest'])
+        assert await repository.get_one(quest_message_id=0, is_admin=not users_data[1]['is_in_quest']) is not None  # updating by quest_message_id
+
+        await repository.update(quest_message_id=0, is_admin=not users_data[1]['is_in_quest'], new_is_in_quest=users_data[1]['is_in_quest'])
+        assert await repository.get_one(quest_message_id=0, is_in_quest=users_data[1]['is_in_quest'])  # updating by is_in_quest
 
         # does not delete non-existent elements and does not throw exceptions
         old_number = len(await repository.get_all())
@@ -90,6 +93,12 @@ async def start(SessionLocal):
         assert await repository.get_one(quest_message_id=users_data[1]['quest_message_id']) is not None  # element exists
         await repository.delete(quest_message_id=users_data[1]['quest_message_id'])  # no exceptions
         assert await repository.get_one(quest_message_id=users_data[1]['quest_message_id']) is None  # element deleted
+
+        await repository.delete()
+        assert await repository.add(users_data) == users_data
+        assert await repository.get_one(is_in_quest=users_data[1]['is_in_quest']) is not None  # element exists
+        await repository.delete(is_in_quest=users_data[1]['is_in_quest'])  # no exceptions
+        assert await repository.get_one(is_in_quest=users_data[1]['is_in_quest']) is None  # element deleted
 
         # return of modified data
         await repository.delete()
