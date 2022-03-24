@@ -20,7 +20,9 @@ async def start(SessionLocal):
         repository = UserDataRepository(session)
 
         # adding items does not throw exceptions
-        assert await repository.add(users_data) == users_data  # no exceptions
+        users_data_from_db = await repository.add(users_data)
+        assert all(users_data[i].items() <= users_data_from_db[i].items() for i in range(len(users_data_from_db)))
+        del users_data_from_db
 
         # updating all data for all parameters does not throw exceptions
         old_uid = (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['uid']
@@ -48,11 +50,11 @@ async def start(SessionLocal):
         await repository.update(step=scripts[1]['title'], new_quest_message_id=0)
         assert await repository.get_one(quest_message_id=0) is not None  # updating by step
 
-        await repository.update(quest_message_id=0, new_is_admin=not users_data[1]['is_in_quest'])
-        assert await repository.get_one(quest_message_id=0, is_admin=not users_data[1]['is_in_quest']) is not None  # updating by quest_message_id
+        await repository.update(quest_message_id=0, new_is_admin=True)
+        assert await repository.get_one(quest_message_id=0, is_admin=True) is not None  # updating by quest_message_id
 
-        await repository.update(quest_message_id=0, is_admin=not users_data[1]['is_in_quest'], new_is_in_quest=users_data[1]['is_in_quest'])
-        assert await repository.get_one(quest_message_id=0, is_in_quest=users_data[1]['is_in_quest'])  # updating by is_in_quest
+        await repository.update(quest_message_id=0, is_admin=True, new_is_in_quest=False)
+        assert await repository.get_one(quest_message_id=0, is_in_quest=False)  # updating by is_in_quest
 
         # does not delete non-existent elements and does not throw exceptions
         old_number = len(await repository.get_all())
@@ -61,25 +63,27 @@ async def start(SessionLocal):
         del old_number
 
         # deletes by parameter
-        assert await repository.add(users_data[1]) == users_data[1]
+        assert (await repository.add(users_data[1])).items() >= users_data[1].items()
         old_uid = (await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']))['uid']
         assert await repository.get_one(uid=old_uid) is not None  # element exists
         await repository.delete(uid=old_uid)  # no exceptions
         assert await repository.get_one(uid=old_uid) is None  # element deleted
         del old_uid
 
-        assert await repository.add(users_data[1]) == users_data[1]
+        assert (await repository.add(users_data[1])).items() >= users_data[1].items()
         assert await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']) is not None  # element exists
         await repository.delete(tg_chat_id=users_data[1]['tg_chat_id'])  # no exceptions
         assert await repository.get_one(tg_chat_id=users_data[1]['tg_chat_id']) is None  # element deleted
 
-        assert await repository.add(users_data[1]) == users_data[1]
+        assert (await repository.add(users_data[1])).items() >= users_data[1].items()
         assert await repository.get_one(is_admin=users_data[1]['is_admin']) is not None  # element exists
         await repository.delete(is_admin=users_data[1]['is_admin'])  # no exceptions
         assert await repository.get_one(is_admin=users_data[1]['is_admin']) is None  # element deleted
 
         await repository.delete()
-        assert await repository.add(users_data) == users_data
+        users_data_from_db = await repository.add(users_data)
+        assert all(users_data[i].items() <= users_data_from_db[i].items() for i in range(len(users_data_from_db)))
+        del users_data_from_db
         for user_data in users_data:
             if 'step' in user_data.keys():
                 user_data = user_data
@@ -89,16 +93,20 @@ async def start(SessionLocal):
         assert await repository.get_one(step=user_data['step']) is None  # element deleted
 
         await repository.delete()
-        assert await repository.add(users_data) == users_data
+        users_data_from_db = await repository.add(users_data)
+        assert all(users_data[i].items() <= users_data_from_db[i].items() for i in range(len(users_data_from_db)))
+        del users_data_from_db
         assert await repository.get_one(quest_message_id=users_data[1]['quest_message_id']) is not None  # element exists
         await repository.delete(quest_message_id=users_data[1]['quest_message_id'])  # no exceptions
         assert await repository.get_one(quest_message_id=users_data[1]['quest_message_id']) is None  # element deleted
 
         await repository.delete()
-        assert await repository.add(users_data) == users_data
-        assert await repository.get_one(is_in_quest=users_data[1]['is_in_quest']) is not None  # element exists
-        await repository.delete(is_in_quest=users_data[1]['is_in_quest'])  # no exceptions
-        assert await repository.get_one(is_in_quest=users_data[1]['is_in_quest']) is None  # element deleted
+        users_data_from_db = await repository.add(users_data)
+        assert all(users_data[i].items() <= users_data_from_db[i].items() for i in range(len(users_data_from_db)))
+        del users_data_from_db
+        assert await repository.get_one(is_in_quest=False) is not None  # element exists
+        await repository.delete(is_in_quest=False)  # no exceptions
+        assert await repository.get_one(is_in_quest=False) is None  # element deleted
 
         # return of modified data
         await repository.delete()
