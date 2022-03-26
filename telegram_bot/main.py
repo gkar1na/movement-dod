@@ -1,6 +1,10 @@
 import logging
 from aiogram import executor, types
 
+# TODO idk how install own module by "pip install -Ue ." – it doesn't work
+import sys
+sys.path.append('..')
+
 import telegram_bot.handlers
 
 from telegram_bot.config import dp
