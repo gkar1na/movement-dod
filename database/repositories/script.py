@@ -8,7 +8,7 @@ from database.create_table import ScriptModel
 
 
 class ScriptDB:
-    __tablename__ = 'script'
+    __tablename__ = ScriptModel.__tablename__
 
     uid: Union[UUID, str, None]
     title: str
@@ -34,14 +34,24 @@ class ScriptDB:
             self.text == other.text
         )
 
-    def __le__(self, other):
+    def __le__(self, other: Any):
         if not isinstance(other, ScriptDB):
             return False
 
         return (
-            (self.uid == other.uid or self.uid == '' or other.uid == '') and
-            (self.title == other.title or self.title == '' or other.title == '') and
-            (self.text == other.text or self.text == '' or other.text == '')
+            (self.uid == other.uid or self.uid == '') and
+            (self.title == other.title or self.title == '') and
+            (self.text == other.text or self.text == '')
+        )
+
+    def __ge__(self, other: Any):
+        if not isinstance(other, ScriptDB):
+            return False
+
+        return (
+                (self.uid == other.uid or other.uid == '') and
+                (self.title == other.title or other.title == '') and
+                (self.text == other.text or other.text == '')
         )
 
 
@@ -122,7 +132,6 @@ class ScriptRepository:
     ) -> Union[ScriptDB, List[ScriptDB], None]:
         if type(request_scripts) == ScriptDB:
             request_scripts = [request_scripts]
-
 
         for script in request_scripts:
             params = {}

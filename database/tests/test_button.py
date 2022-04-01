@@ -1,6 +1,6 @@
 from random import randint
 
-from database.repositories.button import ButtonRepository
+from database.repositories.button import ButtonRepository, ButtonDB
 from database.tests.test_data import buttons
 
 from database.repositories.script import ScriptRepository
@@ -18,68 +18,55 @@ async def start(SessionLocal):
             i_to = randint(0, len_scripts)
             while i_to == i_from:
                 i_to = randint(0, len_scripts)
-            button['title_from'] = scripts[i_from]['title']
-            button['title_to'] = scripts[i_to]['title']
+            button.title_from = scripts[i_from].title
+            button.title_to = scripts[i_to].title
 
         repository = ButtonRepository(session)
 
         # adding items does not throw exceptions
-        assert await repository.add(buttons) == buttons  # no exceptions
+        load_buttons = await repository.add(buttons)
+        assert all(buttons[i] <= load_buttons[i] for i in range(len(buttons)))  # no exceptions
 
         # updating all data for all parameters does not throw exceptions
-        old_uid = (await repository.get_one(title_from=buttons[1]['title_from']))['uid']
         await repository.update()  # empty query throws no exceptions
         # updating zero amount of data does not change the item
-        assert (await repository.get_one(title_from=buttons[1]['title_from']))['title_from'] == buttons[1]['title_from']
-        assert (await repository.get_one(title_from=buttons[1]['title_from']))['text'] == buttons[1]['text']
-        assert (await repository.get_one(title_from=buttons[1]['title_from']))['title_to'] == buttons[1]['title_to']
-        await repository.update(uid=old_uid)
-        assert (await repository.get_one(title_from=buttons[1]['title_from']))['title_from'] == buttons[1]['title_from']
-        assert (await repository.get_one(title_from=buttons[1]['title_from']))['text'] == buttons[1]['text']
-        assert (await repository.get_one(title_from=buttons[1]['title_from']))['title_to'] == buttons[1]['title_to']
-        await repository.update(new_text='100000000')
-        assert await repository.get_one(text='100000000') is None  # no update is performed without input data
+        assert (await repository.get_one(buttons[1])) >= buttons[1]
+        await repository.update(buttons[1])
+        assert await repository.get_one(buttons[1]) >= buttons[1]
+        new_button = ButtonDB(text='new_text')
+        await repository.update(new_button=new_button)
+        assert await repository.get_one(new_button) is None  # no update is performed without input data
 
-        await repository.update(uid=old_uid, new_title_from=scripts[0]['title'])
-        assert await repository.get_one(title_from=scripts[0]['title']) is not None  # updating by uid
+        new_button = ButtonDB(
+            title_to=scripts[0].title,
+            text='new_text',
+            title_from=scripts[0].title
+        )
+        await repository.update(request_button=buttons[1], new_button=new_button)
+        assert await repository.get_one(new_button) >= new_button  # updating by ButtonDB
+        assert len(await repository.get_all(new_button)) == 1
 
-        await repository.update(title_from=scripts[0]['title'], new_text='new text')
-        assert await repository.get_one(text='new text') is not None  # updating by title_from
-
-        await repository.update(text='new text', new_title_to=scripts[1]['title'])
-        assert await repository.get_one(title_to=scripts[1]['title']) is not None  # updating by text
-
-        await repository.update(title_to=scripts[1]['title'], new_title_to=scripts[2]['title'])
-        assert await repository.get_one(title_to=scripts[2]['title']) is not None  # updating by text
+        # return of modified data
+        await repository.update(request_button=new_button, new_button=buttons[1])
+        assert await repository.get_one(buttons[1]) >= buttons[1]
+        assert len(await repository.get_all(buttons[1])) == 1
+        assert await repository.get_one(new_button) is None
+        assert len(await repository.get_all(new_button)) == 0
 
         # does not delete non-existent elements and does not throw exceptions
         old_number = len(await repository.get_all())
-        await repository.delete(text='123')  # no exceptions
+        await repository.delete(new_button)  # no exceptions
         assert old_number == len(await repository.get_all())  # the number of elements has not changed
-        del old_number
 
         # deletes by parameter
-        assert await repository.add(buttons[1]) == buttons[1]
-        old_uid = (await repository.get_one(text=buttons[1]['text']))['uid']
-        assert await repository.get_one(uid=old_uid) is not None  # element exists
-        await repository.delete(uid=old_uid)  # no exceptions
-        assert await repository.get_one(uid=old_uid) is None  # element deleted
-        del old_uid
-
-        assert await repository.add(buttons[1]) == buttons[1]
-        assert await repository.get_one(title_from=buttons[1]['title_from']) is not None  # element exists
-        await repository.delete(title_from=buttons[1]['title_from'])  # no exceptions
-        assert await repository.get_one(title_from=buttons[1]['title_from']) is None  # element deleted
-
-        assert await repository.add(buttons[1]) == buttons[1]
-        assert await repository.get_one(text=buttons[1]['text']) is not None  # element exists
-        await repository.delete(text=buttons[1]['text'])  # no exceptions
-        assert await repository.get_one(text=buttons[1]['text']) is None  # element deleted
-
-        assert await repository.add(buttons[1]) == buttons[1]
-        assert await repository.get_one(title_to=buttons[1]['title_to']) is not None  # element exists
-        await repository.delete(title_to=buttons[1]['title_to'])  # no exceptions
-        assert await repository.get_one(title_to=buttons[1]['title_to']) is None  # element deleted
+        await repository.delete()
+        load_buttons = await repository.add(buttons)
+        assert all(buttons[i] <= load_buttons[i] for i in range(len(buttons)))
+        assert await repository.get_one(buttons[1]) >= buttons[1]  # element exists
+        await repository.delete(buttons[1])  # no exceptions
+        assert await repository.get_one(buttons[1]) is None  # element deleted
+        assert old_number - 1 == len(await repository.get_all())
+        del new_button, old_number
 
         # return of modified data
         await repository.delete()
