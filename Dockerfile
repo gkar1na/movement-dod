@@ -5,6 +5,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 COPY database /home/database
+COPY spreadsheet_parser /home/spreadsheet_parser
 COPY telegram_bot /home/telegram_bot
 
 WORKDIR /home/database

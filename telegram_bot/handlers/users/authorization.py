@@ -10,12 +10,14 @@ from database.repositories.user_data import UserDataRepository, UserDataDB
 from database.repositories.script import ScriptRepository, ScriptDB
 
 from telegram_bot.config import settings
+from telegram_bot.utils.misc.throttling import rate_limit
 
 
 logger = logging.getLogger(__name__)
 
 
 @dp.message_handler(commands=['start'])
+@rate_limit(30)
 async def send_welcome(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)

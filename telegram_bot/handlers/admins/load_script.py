@@ -3,6 +3,8 @@ import logging
 from aiogram import types
 
 from telegram_bot.config import dp
+from telegram_bot.utils.misc.throttling import rate_limit
+
 
 from database.create_table import SessionLocal
 from database.repositories.user_data import UserDataRepository, UserDataDB
@@ -12,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @dp.message_handler(commands=['load_script'])
+@rate_limit(30)
 async def run_quest(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)
@@ -20,4 +23,7 @@ async def run_quest(message: types.Message):
     arguments = arguments[0] if arguments else None
     if not user_data.is_admin:
         return
+
     await message.reply(f'Здесь будет обновление данных из таблицы:\n{arguments}')  # TODO add parser
+
+    await session.close()

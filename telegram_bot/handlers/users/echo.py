@@ -3,6 +3,7 @@ from aiogram import types
 from uuid import UUID
 
 from telegram_bot.config import dp
+from telegram_bot.utils.misc.throttling import rate_limit
 
 from telegram_bot.handlers.admins.authorization import read_token
 
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @dp.message_handler()
+@rate_limit(30)
 async def echo(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)

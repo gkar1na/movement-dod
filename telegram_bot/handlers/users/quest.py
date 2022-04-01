@@ -3,6 +3,7 @@ from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 
 from telegram_bot.config import dp
+from telegram_bot.utils.misc.throttling import rate_limit
 
 from database.create_table import SessionLocal
 from database.repositories.user_data import UserDataRepository, UserDataDB
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @dp.callback_query_handler()
+@rate_limit(1)
 async def callback_run_quest(callback: types.CallbackQuery):
     session = SessionLocal()
     script_rep = ScriptRepository(session)
@@ -31,6 +33,7 @@ async def callback_run_quest(callback: types.CallbackQuery):
 
 
 @dp.message_handler(commands=['quest'])
+@rate_limit(1)
 async def command_run_quest(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)
