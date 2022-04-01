@@ -168,13 +168,14 @@ class UserDataRepository:
             return users_data[0]
         return None
 
-    async def delete(self, request_user_data: UserDataDB = '') -> None:
+    async def delete(self, request_user_data: UserDataDB = '') -> Optional[UserDataDB]:
         query = fill_query(delete(UserDataModel), request_user_data)
 
+        response_user_data = await self.get_one(request_user_data)
         await self.session.execute(query)
         await self.session.commit()
 
-        return None
+        return response_user_data
 
     async def add(
             self,
@@ -232,10 +233,13 @@ class UserDataRepository:
         return response_users_data
 
     async def update(self, request_user_data: UserDataDB = '',
-                     new_user_data: UserDataDB = '') -> None:
+                     new_user_data: UserDataDB = '') -> Optional[UserDataDB]:
         query = fill_query(update(UserDataModel), request_user_data, new_user_data)
         if query is None:
             return None
 
+        response_user_data = await self.get_one(request_user_data)
         await self.session.execute(query)
         await self.session.commit()
+
+        return response_user_data

@@ -118,13 +118,14 @@ class ScriptRepository:
             return scripts[0]
         return None
 
-    async def delete(self, request_script: ScriptDB = '') -> None:
+    async def delete(self, request_script: ScriptDB = '') -> Optional[ScriptDB]:
         query = fill_query(delete(ScriptModel), request_script)
 
+        response_script = await self.get_one(request_script)
         await self.session.execute(query)
         await self.session.commit()
 
-        return None
+        return response_script
 
     async def add(
             self,
@@ -175,10 +176,14 @@ class ScriptRepository:
 
         return response_scripts
 
-    async def update(self, request_script: ScriptDB = '', new_script: ScriptDB = '') -> None:
+    async def update(self, request_script: ScriptDB = '',
+                     new_script: ScriptDB = '') -> Optional[ScriptDB]:
         query = fill_query(update(ScriptModel), request_script, new_script)
         if query is None:
             return None
 
+        response_script = await self.get_one(request_script)
         await self.session.execute(query)
         await self.session.commit()
+
+        return response_script

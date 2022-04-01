@@ -133,13 +133,14 @@ class ButtonRepository:
             return buttons[0]
         return None
 
-    async def delete(self, request_button: ButtonDB = '') -> None:
+    async def delete(self, request_button: ButtonDB = '') -> Optional[ButtonDB]:
         query = fill_query(delete(ButtonModel), request_button)
 
+        response_button = await self.get_one(request_button)
         await self.session.execute(query)
         await self.session.commit()
 
-        return None
+        return response_button
 
     async def add(
             self,
@@ -196,10 +197,14 @@ class ButtonRepository:
 
         return response_buttons
 
-    async def update(self, request_button: ButtonDB = '', new_button: ButtonDB = '') -> None:
+    async def update(self, request_button: ButtonDB = '',
+                     new_button: ButtonDB = '') -> Optional[ButtonDB]:
         query = fill_query(update(ButtonModel), request_button, new_button)
         if query is None:
             return None
 
+        response_button = await self.get_one(request_button)
         await self.session.execute(query)
         await self.session.commit()
+
+        return response_button

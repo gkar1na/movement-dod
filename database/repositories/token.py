@@ -119,13 +119,14 @@ class TokenRepository:
             return tokens[0]
         return None
 
-    async def delete(self, request_token: TokenDB = '') -> None:
+    async def delete(self, request_token: TokenDB = '') -> Optional[TokenDB]:
         query = fill_query(delete(TokenModel), request_token)
 
+        response_token = await self.get_one(request_token)
         await self.session.execute(query)
         await self.session.commit()
 
-        return None
+        return request_token
 
     async def add(
             self,
@@ -170,10 +171,14 @@ class TokenRepository:
 
         return response_tokens
 
-    async def update(self, request_token: TokenDB = '', new_token: TokenDB = '') -> None:
+    async def update(self, request_token: TokenDB = '',
+                     new_token: TokenDB = '') -> Optional[TokenDB]:
         query = fill_query(update(TokenModel), request_token, new_token)
         if query is None:
             return None
 
+        response_token = await self.get_one(request_token)
         await self.session.execute(query)
         await self.session.commit()
+
+        return response_token
