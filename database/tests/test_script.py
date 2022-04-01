@@ -1,4 +1,6 @@
-from database.repositories.script import ScriptRepository
+import uuid
+
+from database.repositories.script import ScriptRepository, ScriptDB
 from database.tests.test_data import scripts
 
 
@@ -9,52 +11,49 @@ async def start(SessionLocal):
         repository = ScriptRepository(session)
 
         # adding items does not throw exceptions
-        assert await repository.add(scripts) == scripts  # no exceptions
+        # print(scripts[0])
+        load_scripts = await repository.add(scripts)
+        assert all(scripts[i] <= load_scripts[i] for i in range(len(scripts)))  # no exceptions
 
         # updating all data for all parameters does not throw exceptions
-        old_uid = (await repository.get_one(title=scripts[1]['title']))['uid']
         await repository.update()  # empty query throws no exceptions
         # updating zero amount of data does not change the item
-        assert (await repository.get_one(title=scripts[1]['title']))['title'] == scripts[1]['title']
-        assert (await repository.get_one(title=scripts[1]['title']))['text'] == scripts[1]['text']
-        await repository.update(uid=old_uid)
-        assert (await repository.get_one(title=scripts[1]['title']))['title'] == scripts[1]['title']
-        assert (await repository.get_one(title=scripts[1]['title']))['text'] == scripts[1]['text']
-        await repository.update(new_title='100000000')
-        assert await repository.get_one(title='100000000') is None  # no update is performed without input data
+        assert await repository.get_one(scripts[1]) <= scripts[1]
+        await repository.update(scripts[1])
+        assert await repository.get_one(scripts[1]) <= scripts[1]
+        new_script = ScriptDB(title='new_title')
+        await repository.update(new_script=new_script)
+        assert await repository.get_one(new_script) is None  # no update is performed without input data
 
-        await repository.update(uid=old_uid, new_title='new title')
-        assert await repository.get_one(title='new title') is not None  # updating by uid
+        new_script = ScriptDB(
+            title='new_title',
+            text='new_text'
+        )
+        await repository.update(request_script=scripts[1], new_script=new_script)
+        assert await repository.get_one(new_script) <= new_script  # updating by ScriptDB
+        assert len(await repository.get_all(new_script)) == 1
 
-        await repository.update(title='new title', new_text='new text')
-        assert await repository.get_one(text='new text') is not None  # updating by title
-
-        await repository.update(text='new text', new_text='the newest text')
-        assert await repository.get_one(text='the newest text') is not None  # updating by text
+        # return of modified data
+        await repository.update(request_script=new_script, new_script=scripts[1])
+        assert await repository.get_one(scripts[1]) <= scripts[1]
+        assert len(await repository.get_all(scripts[1])) == 1
+        assert await repository.get_one(new_script) is None
+        assert len(await repository.get_all(new_script)) == 0
 
         # does not delete non-existent elements and does not throw exceptions
         old_number = len(await repository.get_all())
-        await repository.delete(title='123')  # no exceptions
+        await repository.delete(new_script)  # no exceptions
         assert old_number == len(await repository.get_all())  # the number of elements has not changed
-        del old_number
 
         # deletes by parameter
-        assert await repository.add(scripts[1]) == scripts[1]
-        assert await repository.get_one(uid=old_uid) is not None  # element exists
-        await repository.delete(uid=old_uid)  # no exceptions
-        assert await repository.get_one(uid=old_uid) is None  # element deleted
-        del old_uid
-
         await repository.delete()
-        assert await repository.add(scripts) == scripts
-        assert await repository.get_one(title=scripts[1]['title']) is not None  # element exists
-        await repository.delete(title=scripts[1]['title'])  # no exceptions
-        assert await repository.get_one(title=scripts[1]['title']) is None  # element deleted
-
-        assert await repository.add(scripts[1]) == scripts[1]
-        assert await repository.get_one(text=scripts[1]['text']) is not None  # element exists
-        await repository.delete(text=scripts[1]['text'])  # no exceptions
-        assert await repository.get_one(text=scripts[1]['text']) is None  # element deleted
+        load_scripts = await repository.add(scripts)
+        assert all(scripts[i] <= load_scripts[i] for i in range(len(scripts)))
+        assert await repository.get_one(scripts[1]) <= scripts[1]  # element exists
+        await repository.delete(scripts[1])  # no exceptions
+        assert await repository.get_one(scripts[1]) is None  # element deleted
+        assert old_number - 1 == len(await repository.get_all())
+        del new_script, old_number
 
         # return of modified data
         await repository.delete()
