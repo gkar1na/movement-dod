@@ -20,4 +20,4 @@ async def run_quest(message: types.Message):
     arguments = arguments[0] if arguments else None
     if not user_data.is_admin:
         return
-    await message.reply(f'Здесь будет обновление данных из таблицы:\n{arguments}')  # TODO
+    await message.reply(f'Здесь будет обновление данных из таблицы:\n{arguments}')  # TODO add parser
