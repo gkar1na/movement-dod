@@ -145,7 +145,7 @@ class ButtonRepository:
             self,
             request_buttons: Union[ButtonDB, List[ButtonDB]]
     ) -> Union[ButtonDB, List[ButtonDB], None]:
-        if type(request_buttons) == dict:
+        if isinstance(request_buttons, ButtonDB):
             request_buttons = [request_buttons]
 
         for button in request_buttons:

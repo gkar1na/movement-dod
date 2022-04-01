@@ -11,8 +11,8 @@ class ScriptDB:
     __tablename__ = ScriptModel.__tablename__
 
     uid: Union[UUID, str, None]
-    title: str
-    text: str
+    title: Optional[str]
+    text: Optional[str]
 
     def __init__(self, uid='', title='', text=''):
         self.uid = uid
@@ -29,9 +29,9 @@ class ScriptDB:
             return False
 
         return (
-            self.uid == other.uid and
-            self.title == other.title and
-            self.text == other.text
+                self.uid == other.uid and
+                self.title == other.title and
+                self.text == other.text
         )
 
     def __le__(self, other: Any):
@@ -39,9 +39,9 @@ class ScriptDB:
             return False
 
         return (
-            (self.uid == other.uid or self.uid == '') and
-            (self.title == other.title or self.title == '') and
-            (self.text == other.text or self.text == '')
+                (self.uid == other.uid or self.uid == '') and
+                (self.title == other.title or self.title == '') and
+                (self.text == other.text or self.text == '')
         )
 
     def __ge__(self, other: Any):
@@ -130,7 +130,7 @@ class ScriptRepository:
             self,
             request_scripts: Union[ScriptDB, List[ScriptDB]]
     ) -> Union[ScriptDB, List[ScriptDB], None]:
-        if type(request_scripts) == ScriptDB:
+        if isinstance(request_scripts, ScriptDB):
             request_scripts = [request_scripts]
 
         for script in request_scripts:
