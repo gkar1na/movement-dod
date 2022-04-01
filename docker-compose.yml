@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: db
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - 5433:5432
+    volumes:
+      - postgres:/data/postgres
+    restart: always
+
+  database:
+    container_name: database
+    build: ./database
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  telegram_bot:
+    container_name: telegram_bot
+    image: aiogram/telegram-bot-api:latest
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - telegram-bot-api-data:/var/lib/telegram-bot-api
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
+      - database
+    restart: unless-stopped
+
+
+volumes:
+  postgres:
+  pgadmin:
+  telegram-bot-api-data:

@@ -10,6 +10,10 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from uuid import uuid4
 
+# TODO idk how install own module by "pip install -Ue ." – it doesn't work
+import sys
+sys.path.append('..')
+
 from database.config import settings
 
 
