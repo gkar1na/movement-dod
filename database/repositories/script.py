@@ -175,8 +175,7 @@ class ScriptRepository:
 
         return response_scripts
 
-    async def update(self, request_script: Optional[ScriptDB] = '',
-                     new_script: Optional[ScriptDB] = '') -> None:
+    async def update(self, request_script: ScriptDB = '', new_script: ScriptDB = '') -> None:
         query = fill_query(update(ScriptModel), request_script, new_script)
         if query is None:
             return None

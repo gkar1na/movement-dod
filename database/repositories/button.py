@@ -196,8 +196,7 @@ class ButtonRepository:
 
         return response_buttons
 
-    async def update(self, request_button: Optional[ButtonDB] = '',
-                     new_button: Optional[ButtonDB] = '') -> None:
+    async def update(self, request_button: ButtonDB = '', new_button: ButtonDB = '') -> None:
         query = fill_query(update(ButtonModel), request_button, new_button)
         if query is None:
             return None

@@ -33,7 +33,7 @@ class TestBase:
         await test_script.start(session_local)
         await test_button.start(session_local)
         await test_user_data.start(session_local)
-        # await test_token.start(session_local)
+        await test_token.start(session_local)
         # await test_dropping.start(engine, Base)
 
         print('------------------FINISH TESTING-----------------')
