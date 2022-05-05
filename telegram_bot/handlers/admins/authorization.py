@@ -15,6 +15,8 @@ async def read_token(message: types.Message):
     user_data = await user_data_rep.get_one(UserDataDB(tg_chat_id=message.from_user.id))
     if user_data.is_admin:
         await message.reply(f'Ты уже админ, успокойся.')
+        await session.close()
+        return
 
     token_rep = TokenRepository(session)
     token = await token_rep.get_one(TokenDB(uid=message.text))

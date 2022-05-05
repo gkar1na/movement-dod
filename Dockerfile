@@ -22,4 +22,5 @@ RUN python -m pip install -r requirements.txt
 RUN python -m pip install -Ue .
 
 #CMD ["python", "../database/create_table.py"]
+#CMD ["python", "../spreadsheet_parser/load_first.py"]
 CMD ["python", "main.py"]

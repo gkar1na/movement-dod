@@ -7,6 +7,7 @@ from sqlalchemy.sql.schema import Column, ForeignKey, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.sql.expression import text
 
 from uuid import uuid4
 
@@ -61,12 +62,12 @@ class ButtonModel(Base):
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     title_from = Column(
         String,
-        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
+        # ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
     )
     text = Column(String, nullable=False)
     title_to = Column(
         String,
-        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
+        # ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
     )
 
 
@@ -99,6 +100,7 @@ class TokenModel(Base):
 async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'))
     return 0
 
 

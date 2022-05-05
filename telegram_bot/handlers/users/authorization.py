@@ -42,7 +42,8 @@ async def send_welcome(message: types.Message):
                 request_user_data=user_data,
                 new_user_data=UserDataDB(
                     is_admin=False,
-                    step=settings.WELCOME_TITLE
+                    step=settings.WELCOME_TITLE,
+                    is_in_quest=False
                 )
             )
         except MessageNotModified:
@@ -55,7 +56,7 @@ async def send_welcome(message: types.Message):
     user_data = await user_data_rep.update(
         request_user_data=user_data,
         new_user_data=UserDataDB(
-            quest_message_id=new_quest_message
+            quest_message_id=new_quest_message.message_id
         )
     )
 

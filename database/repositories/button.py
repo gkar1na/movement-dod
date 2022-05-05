@@ -91,14 +91,17 @@ def fill_query(query, request_button: ButtonDB = '', new_button: ButtonDB = ''):
 
             if new_button.title_from != '':
                 is_query_empty = False
+                request_button.title_from = new_button.title_from
                 query = query.values(title_from=new_button.title_from)
 
             if new_button.text != '':
                 is_query_empty = False
+                request_button.text = new_button.text
                 query = query.values(text=new_button.text)
 
             if new_button.title_to != '':
                 is_query_empty = False
+                request_button.title_to = new_button.title_to
                 query = query.values(title_to=new_button.title_to)
 
         if is_query_empty:
@@ -203,8 +206,7 @@ class ButtonRepository:
         if query is None:
             return None
 
-        response_button = await self.get_one(request_button)
         await self.session.execute(query)
         await self.session.commit()
 
-        return response_button
+        return request_button

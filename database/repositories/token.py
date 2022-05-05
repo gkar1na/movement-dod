@@ -82,10 +82,12 @@ def fill_query(query, request_token: TokenDB = '', new_token: TokenDB = ''):
 
             if new_token.is_active != '':
                 is_query_empty = False
+                request_token.is_active = new_token.is_active
                 query = query.values(is_active=new_token.is_active)
 
             if new_token.tg_chat_id != '':
                 is_query_empty = False
+                request_token.tg_chat_id = new_token.tg_chat_id
                 query = query.values(tg_chat_id=new_token.tg_chat_id)
 
         if is_query_empty:
@@ -177,8 +179,7 @@ class TokenRepository:
         if query is None:
             return None
 
-        response_token = await self.get_one(request_token)
         await self.session.execute(query)
         await self.session.commit()
 
-        return response_token
+        return request_token

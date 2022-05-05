@@ -16,6 +16,24 @@ logging.basicConfig(level=logging.INFO)
 
 
 async def on_startup(dispatcher):
+    from database.repositories.script import ScriptRepository
+    from database.create_table import SessionLocal
+    from spreadsheet_parser.sheet2db import convert
+    from spreadsheet_parser.config import settings
+
+    session = SessionLocal()
+    script_repository = ScriptRepository(session)
+    scripts = await script_repository.get_one()
+    await session.close()
+
+    if not scripts:
+        await convert(
+            settings.SPREADSHEET_ID,
+            settings.DB_PATH,
+            creds_file_name='../spreadsheet_parser/credentials.json',
+            token_file_name='../spreadsheet_parser/token.json'
+        )
+
     await set_default_commands(dispatcher)
     await on_startup_notify(dispatcher)
 
