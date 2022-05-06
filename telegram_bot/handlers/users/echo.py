@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from aiogram import types
 from uuid import UUID
 
@@ -11,11 +11,8 @@ from database.create_table import SessionLocal
 from database.repositories.user_data import UserDataRepository, UserDataDB
 
 
-logger = logging.getLogger(__name__)
-
-
 @dp.message_handler()
-@rate_limit(30)
+@rate_limit(1)
 async def echo(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)
@@ -26,13 +23,14 @@ async def echo(message: types.Message):
         except Exception as e:
             logger.error(e)
         else:
-            await message.reply('Ты добавлен в базу данных.')
+            await message.reply('/start')
 
     try:
         UUID(message.text, version=4)
     except ValueError:
         # if the user writes something other than the token
-        await message.reply(message.text)  # TODO response to any message
+        await message.reply(f'/start')  # TODO response to any message
+        logger.info(f'Message from username={message.from_user.username}: "{message.text}"')
     else:
         await read_token(message)
 

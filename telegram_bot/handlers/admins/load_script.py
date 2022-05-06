@@ -1,5 +1,4 @@
-import re
-import logging
+from loguru import logger
 from aiogram import types
 from telegram_bot.config import dp
 from telegram_bot.utils.misc.throttling import rate_limit
@@ -10,17 +9,15 @@ from spreadsheet_parser.sheet2db import convert
 from spreadsheet_parser.config import settings
 
 
-logger = logging.getLogger(__name__)
-
-
 @dp.message_handler(commands=['load_script'])
-@rate_limit(10)
+@rate_limit(1)
 async def run_quest(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)
     user_data = await user_data_rep.get_one(UserDataDB(tg_chat_id=message.from_user.id))
     if not user_data.is_admin:
         await session.close()
+        await message.reply(f'Permission error.')
         return
 
     link = message.get_args()
@@ -48,9 +45,13 @@ async def run_quest(message: types.Message):
             token_file_name='../spreadsheet_parser/token.json'
         )
     except Exception as e:
-        logger.error(e)
+        logger.error(f'Creating new token from '
+                     f'id={message.from_user.id}, username={message.from_user.username}: "{e}"')
         await message.reply(f'ERROR.')
     else:
-        await message.reply(f'DB is up-to-date.')
+        await message.reply(f'Сценарий успешно обновлён.')
+        logger.warning(f'Update script from '
+                       f'id={message.from_user.id}, username={message.from_user.username}: '
+                       f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}')
 
     await session.close()

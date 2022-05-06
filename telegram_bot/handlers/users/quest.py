@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 
@@ -11,9 +11,6 @@ from database.repositories.script import ScriptRepository, ScriptDB
 from telegram_bot.keyboards.quest import get_markup
 
 from telegram_bot.config import settings
-
-
-logger = logging.getLogger(__name__)
 
 
 @dp.callback_query_handler(lambda c: c.data == 'null')
@@ -55,7 +52,7 @@ async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITL
                 reply_markup=None
             )
         except MessageNotModified as e:
-            logger.info(f'User "{user_data.tg_chat_id}": {e}')
+            pass
 
     if new_step == settings.STOP_TITLE:
         if user_data.is_in_quest:

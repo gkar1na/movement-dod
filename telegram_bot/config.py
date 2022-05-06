@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     STOP_TITLE: Optional[str]
     WELCOME_TITLE: Optional[str]
     ADMINS: Optional[list]
+    LOGS_BASE_PATH: Optional[str] = ''
 
     class Config:
         env_prefix = 'MOVEMENT_QUEST_'
