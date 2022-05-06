@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 
@@ -13,7 +13,15 @@ from telegram_bot.keyboards.quest import get_markup
 from telegram_bot.config import settings
 
 
-logger = logging.getLogger(__name__)
+@dp.callback_query_handler(lambda c: c.data == 'null')
+@dp.message_handler(commands=['quest'])
+@rate_limit(1)
+async def command_run_quest(message: types.Message):
+    session = SessionLocal()
+    user_data_rep = UserDataRepository(session)
+    user_data = await user_data_rep.get_one(UserDataDB(tg_chat_id=message.from_user.id))
+
+    await run_quest(session, user_data, user_data.step)
 
 
 @dp.callback_query_handler()
@@ -32,16 +40,6 @@ async def callback_run_quest(callback: types.CallbackQuery):
     await run_quest(session, user_data, callback.data)
 
 
-@dp.message_handler(commands=['quest'])
-@rate_limit(1)
-async def command_run_quest(message: types.Message):
-    session = SessionLocal()
-    user_data_rep = UserDataRepository(session)
-    user_data = await user_data_rep.get_one(UserDataDB(tg_chat_id=message.from_user.id))
-
-    await run_quest(session, user_data, user_data.step)
-
-
 async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITLE):
     user_data_rep = UserDataRepository(session)
 
@@ -53,10 +51,10 @@ async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITL
                 inline_message_id=None,
                 reply_markup=None
             )
-        except MessageNotModified:
+        except MessageNotModified as e:
             pass
 
-    if new_step == settings.STOP_TITLE:
+    if new_step == 'остановка квеста':
         if user_data.is_in_quest:
             user_data = await user_data_rep.update(
                 request_user_data=user_data,
@@ -74,7 +72,7 @@ async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITL
             )
         )
 
-    if user_data.step != settings.STOP_TITLE:
+    if user_data.step != 'остановка квеста':
         if not user_data.is_in_quest:
             user_data = await user_data_rep.update(
                 request_user_data=user_data,
@@ -83,16 +81,30 @@ async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITL
                 )
             )
 
-    message = await dp.bot.send_message(
-        chat_id=user_data.tg_chat_id,
-        text=(await ScriptRepository(session).get_one(ScriptDB(title=user_data.step))).text,
-        reply_markup=await get_markup(session, user_data.step, user_data)
-    )
+    script = await ScriptRepository(session).get_one(ScriptDB(title=user_data.step))
+    quest_message_id = None
+    is_in_quest = user_data.is_in_quest
+    if script is None:
+        await dp.bot.send_message(
+            chat_id=user_data.tg_chat_id,
+            text='/start'
+        )
+        is_in_quest = False
+    else:
+        message = await dp.bot.send_message(
+            chat_id=user_data.tg_chat_id,
+            text=script.text,
+            reply_markup=await get_markup(session, user_data.step, user_data)
+        )
+        quest_message_id = message.message_id
 
     user_data = await user_data_rep.update(
-        request_user_data=user_data,
+        request_user_data=UserDataDB(
+            tg_chat_id=user_data.tg_chat_id
+        ),
         new_user_data=UserDataDB(
-            quest_message_id=message.message_id
+            quest_message_id=quest_message_id,
+            is_in_quest=is_in_quest
         )
     )
 

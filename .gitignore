@@ -228,3 +228,6 @@ $RECYCLE.BIN/
 
 # images directory
 images/
+
+*credentials*
+*token*

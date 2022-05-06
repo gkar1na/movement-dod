@@ -81,10 +81,12 @@ def fill_query(query, request_script: ScriptDB = '', new_script: ScriptDB = ''):
 
             if new_script.title != '':
                 is_query_empty = False
+                request_script.title = new_script.title
                 query = query.values(title=new_script.title)
 
             if new_script.text != '':
                 is_query_empty = False
+                request_script.text = new_script.text
                 query = query.values(text=new_script.text)
 
         if is_query_empty:
@@ -182,8 +184,7 @@ class ScriptRepository:
         if query is None:
             return None
 
-        response_script = await self.get_one(request_script)
         await self.session.execute(query)
         await self.session.commit()
 
-        return response_script
+        return request_script

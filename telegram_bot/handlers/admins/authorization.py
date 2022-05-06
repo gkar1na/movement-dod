@@ -1,12 +1,9 @@
-import logging
+from loguru import logger
 from aiogram import types
 
 from database.create_table import SessionLocal
 from database.repositories.user_data import UserDataRepository, UserDataDB
 from database.repositories.token import TokenRepository, TokenDB
-
-
-logger = logging.getLogger(__name__)
 
 
 async def read_token(message: types.Message):
@@ -15,6 +12,8 @@ async def read_token(message: types.Message):
     user_data = await user_data_rep.get_one(UserDataDB(tg_chat_id=message.from_user.id))
     if user_data.is_admin:
         await message.reply(f'Ты уже админ, успокойся.')
+        await session.close()
+        return
 
     token_rep = TokenRepository(session)
     token = await token_rep.get_one(TokenDB(uid=message.text))
@@ -33,5 +32,7 @@ async def read_token(message: types.Message):
             )
         )
         await message.reply(f'Токен успешно использован.\nВы добавлены в админы.')
+        logger.warning(f'New admin: '
+                       f'id={message.from_user.id}, username={message.from_user.username}')
 
     await session.close()

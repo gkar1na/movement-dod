@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from aiogram import types
 from aiogram.utils.exceptions import MessageNotModified
 
@@ -13,11 +13,8 @@ from telegram_bot.config import settings
 from telegram_bot.utils.misc.throttling import rate_limit
 
 
-logger = logging.getLogger(__name__)
-
-
 @dp.message_handler(commands=['start'])
-@rate_limit(30)
+@rate_limit(1)
 async def send_welcome(message: types.Message):
     session = SessionLocal()
     user_data_rep = UserDataRepository(session)
@@ -28,8 +25,12 @@ async def send_welcome(message: types.Message):
                 tg_chat_id=message.from_user.id,
                 step=settings.WELCOME_TITLE
             ))
+            logger.warning(f'Add user '
+                           f'id={message.from_user.id}, username={message.from_user.username}')
         except Exception as e:
-            logger.error(e)
+            logger.error(f'Adding user '
+                         f'id={message.from_user.id}, username={message.from_user.username}: {e}')
+
     elif user_data.quest_message_id:
         try:
             await dp.bot.edit_message_reply_markup(
@@ -41,8 +42,8 @@ async def send_welcome(message: types.Message):
             user_data = await user_data_rep.update(
                 request_user_data=user_data,
                 new_user_data=UserDataDB(
-                    is_admin=False,
-                    step=settings.WELCOME_TITLE
+                    step=settings.WELCOME_TITLE,
+                    is_in_quest=False
                 )
             )
         except MessageNotModified:
@@ -55,7 +56,7 @@ async def send_welcome(message: types.Message):
     user_data = await user_data_rep.update(
         request_user_data=user_data,
         new_user_data=UserDataDB(
-            quest_message_id=new_quest_message
+            quest_message_id=new_quest_message.message_id
         )
     )
 

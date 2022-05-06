@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from typing import Optional
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -6,9 +6,6 @@ from database.repositories.button import ButtonRepository, ButtonDB
 from database.repositories.user_data import UserDataDB
 
 from telegram_bot.config import settings
-
-
-logger = logging.getLogger(__name__)
 
 
 async def get_markup(session, title: Optional[str], user_data: UserDataDB) -> InlineKeyboardMarkup:
@@ -24,7 +21,7 @@ async def get_markup(session, title: Optional[str], user_data: UserDataDB) -> In
             keyboard.add(InlineKeyboardButton(text=button.text, callback_data=callback_data))
 
     if user_data.is_in_quest:
-        stop_button = await button_rep.get_one(ButtonDB(title_to=settings.STOP_TITLE))
+        stop_button = await button_rep.get_one(ButtonDB(title_to='остановка квеста'))
         if stop_button:
             keyboard.add(
                 InlineKeyboardButton(text=stop_button.text, callback_data=stop_button.title_to)

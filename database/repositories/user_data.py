@@ -116,22 +116,27 @@ def fill_query(query, request_user_data: UserDataDB = '', new_user_data: UserDat
 
             if new_user_data.tg_chat_id != '':
                 is_query_empty = False
+                request_user_data.tg_chat_id = new_user_data.tg_chat_id
                 query = query.values(tg_chat_id=new_user_data.tg_chat_id)
 
             if new_user_data.is_admin != '':
                 is_query_empty = False
+                request_user_data.is_admin = new_user_data.is_admin
                 query = query.values(is_admin=new_user_data.is_admin)
 
             if new_user_data.step != '':
                 is_query_empty = False
+                request_user_data.step = new_user_data.step
                 query = query.values(step=new_user_data.step)
 
             if new_user_data.quest_message_id != '':
                 is_query_empty = False
+                request_user_data.quest_message_id = new_user_data.quest_message_id
                 query = query.values(quest_message_id=new_user_data.quest_message_id)
 
             if new_user_data.is_in_quest != '':
                 is_query_empty = False
+                request_user_data.is_in_quest = new_user_data.is_in_quest
                 query = query.values(is_in_quest=new_user_data.is_in_quest)
 
         if is_query_empty:
@@ -238,8 +243,7 @@ class UserDataRepository:
         if query is None:
             return None
 
-        response_user_data = await self.get_one(request_user_data)
         await self.session.execute(query)
         await self.session.commit()
 
-        return response_user_data
+        return request_user_data
