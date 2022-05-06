@@ -9,8 +9,6 @@ from sqlalchemy.ext.asyncio.engine import AsyncConnection
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.sql.expression import text
 
-from spreadsheet_parser.config import settings
-
 
 async def get_creds(creds_file_name: str, token_file_name: str) -> Credentials:
     SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly',

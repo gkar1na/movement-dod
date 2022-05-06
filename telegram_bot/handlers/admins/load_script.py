@@ -24,15 +24,18 @@ async def run_quest(message: types.Message):
         return
 
     link = message.get_args()
-    index = link.rfind('docs.google.com/spreadsheets/d/')
-    if index == -1:
-        await message.reply(f'Неверная ссылка: "{link}"')
-        await session.close()
-        return
-    spreadsheet_id = link[index + 31:]
-    index = spreadsheet_id.find('/')
-    if index != -1:
-        spreadsheet_id = spreadsheet_id[:index]
+    if link:
+        index = link.rfind('docs.google.com/spreadsheets/d/')
+        if index == -1:
+            await message.reply(f'Неверная ссылка: "{link}"')
+            await session.close()
+            return
+        spreadsheet_id = link[index + 31:]
+        index = spreadsheet_id.find('/')
+        if index != -1:
+            spreadsheet_id = spreadsheet_id[:index]
+    else:
+        spreadsheet_id = settings.SPREADSHEET_ID
 
     await message.reply(f'Здесь будет обновление данных из таблицы:\n'
                         f'https://docs.google.com/spreadsheets/d/{spreadsheet_id}')
