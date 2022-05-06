@@ -28,17 +28,17 @@ services:
       - .env
     volumes:
       - telegram-bot-api-data:/var/lib/telegram-bot-api
+      - ./telegram_bot/logs:/home/telegram_bot/logs
     ports:
       - 8081:8081
     depends_on:
       - db
       - database
     restart: unless-stopped
-#    command:
-#      - 'cd ..'
 
 
 volumes:
   postgres:
   pgadmin:
   telegram-bot-api-data:
+  logs:

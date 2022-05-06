@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncConnection
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.sql.expression import text
+from loguru import logger
 
 
 async def get_creds(creds_file_name: str, token_file_name: str) -> Credentials:
@@ -77,7 +78,7 @@ async def fill_db(connection: AsyncConnection, tables: dict):
         if not tables[table_name]:
             continue
         if not re.search('^[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$', table_name):
-            print(f'ERROR {table_name}: Incorrect table name')
+            logger.error(f'Update table={table_name}: Incorrect table name')
             continue
         rows = tables[table_name][1:]
         columns = list(tables[table_name][0])
@@ -97,7 +98,7 @@ async def fill_db(connection: AsyncConnection, tables: dict):
                     break
                 query += f', {column} varchar(120)'
         if not columns_are_correct:
-            print(f'ERROR {table_name}: Incorrect column name')
+            logger.error(f'Update table={table_name}: Incorrect column name')
             continue
         query += ')'
 
@@ -127,7 +128,7 @@ async def fill_db(connection: AsyncConnection, tables: dict):
             try:
                 await connection.execute(text(query))
             except Exception as e:
-                print(f'ERROR {table_name}: {e}')
+                logger.error(f'Update table={table_name}: {e}')
                 values_are_current = False
                 break
             queries.append(query)

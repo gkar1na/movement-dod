@@ -21,6 +21,7 @@ WORKDIR /home/telegram_bot
 RUN python -m pip install -r requirements.txt
 RUN python -m pip install -Ue .
 
+VOLUME ["logs"]
 #CMD ["python", "../database/create_table.py"]
 #CMD ["python", "../spreadsheet_parser/load_first.py"]
 CMD ["python", "main.py"]
