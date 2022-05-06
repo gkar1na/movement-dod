@@ -54,7 +54,7 @@ async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITL
         except MessageNotModified as e:
             pass
 
-    if new_step == settings.STOP_TITLE:
+    if new_step == 'остановка квеста':
         if user_data.is_in_quest:
             user_data = await user_data_rep.update(
                 request_user_data=user_data,
@@ -72,7 +72,7 @@ async def run_quest(session, user_data: UserDataDB, new_step=settings.START_TITL
             )
         )
 
-    if user_data.step != settings.STOP_TITLE:
+    if user_data.step != 'остановка квеста':
         if not user_data.is_in_quest:
             user_data = await user_data_rep.update(
                 request_user_data=user_data,
