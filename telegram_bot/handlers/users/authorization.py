@@ -42,7 +42,6 @@ async def send_welcome(message: types.Message):
             user_data = await user_data_rep.update(
                 request_user_data=user_data,
                 new_user_data=UserDataDB(
-                    is_admin=False,
                     step=settings.WELCOME_TITLE,
                     is_in_quest=False
                 )
