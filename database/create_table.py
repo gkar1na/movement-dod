@@ -60,15 +60,9 @@ class ButtonModel(Base):
     __tablename__ = 'button'
 
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
-    title_from = Column(
-        String,
-        # ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
-    )
+    title_from = Column(String)
     text = Column(String, nullable=False)
-    title_to = Column(
-        String,
-        # ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
-    )
+    title_to = Column(String)
 
 
 class UserDataModel(Base):
@@ -77,10 +71,7 @@ class UserDataModel(Base):
     uid = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     tg_chat_id = Column(BigInteger, nullable=False, unique=True)
     is_admin = Column(Boolean, default=False)
-    step = Column(
-        String,
-        ForeignKey(ScriptModel.title, onupdate='cascade', ondelete='cascade')
-    )
+    step = Column(String)
     quest_message_id = Column(BigInteger)
     is_in_quest = Column(Boolean, default=False)
 

@@ -96,7 +96,7 @@ async def fill_db(connection: AsyncConnection, tables: dict):
                 if not re.search('^[a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9]$', column):
                     columns_are_correct = False
                     break
-                query += f', {column} varchar(120)'
+                query += f', {column} varchar'
         if not columns_are_correct:
             logger.error(f'Update table={table_name}: Incorrect column name')
             continue

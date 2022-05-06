@@ -19,10 +19,14 @@ async def on_startup(dispatcher):
     from database.create_table import SessionLocal
     from spreadsheet_parser.sheet2db import convert
     from spreadsheet_parser.config import settings
+    from sqlalchemy.exc import ProgrammingError
 
     session = SessionLocal()
-    script_repository = ScriptRepository(session)
-    scripts = await script_repository.get_one()
+    try:
+        script_repository = ScriptRepository(session)
+        scripts = await script_repository.get_one()
+    except ProgrammingError as e:
+        scripts = []
     await session.close()
 
     if not scripts:
