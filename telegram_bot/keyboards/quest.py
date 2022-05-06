@@ -21,7 +21,7 @@ async def get_markup(session, title: Optional[str], user_data: UserDataDB) -> In
             keyboard.add(InlineKeyboardButton(text=button.text, callback_data=callback_data))
 
     if user_data.is_in_quest:
-        stop_button = await button_rep.get_one(ButtonDB(title_from=None))
+        stop_button = await button_rep.get_one(ButtonDB(title_to='остановки квеста'))
         if stop_button:
             keyboard.add(
                 InlineKeyboardButton(text=stop_button.text, callback_data=stop_button.title_to)
